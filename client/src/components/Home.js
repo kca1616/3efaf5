@@ -51,6 +51,7 @@ const Home = ({ user, logout }) => {
 
   const saveMessage = async (body) => {
     const { data } = await axios.post("/api/messages", body);
+    console.log(data);
     return data;
   };
 
@@ -191,7 +192,7 @@ const Home = ({ user, logout }) => {
     if (!user.isFetching) {
       fetchConversations();
     }
-  }, [user]);
+  }, [user, conversations]);
 
   const handleLogout = async () => {
     if (user && user.id) {
