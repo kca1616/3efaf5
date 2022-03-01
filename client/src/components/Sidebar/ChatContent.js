@@ -9,6 +9,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 20,
     flexGrow: 1,
   },
+  
   username: {
     fontWeight: "bold",
     letterSpacing: -0.2,
@@ -18,14 +19,36 @@ const useStyles = makeStyles((theme) => ({
     color: "#9CADC8",
     letterSpacing: -0.17,
   },
+
+  unreadCount: {
+    backgroundColor: "#6CC1FF",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 5,
+    color: "white",
+    padding: 4,
+    borderRadius: "50%",
+    width: '30px',
+    height: '30px',
+    
+  
+    
+  },
+
+  unreadContainer: {
+    marginRight: 20,
+  }
+
 }));
 
-const ChatContent = ({ conversation }) => {
+const ChatContent = ({ conversation, unread, activeConversation }) => {
   const classes = useStyles();
 
   const { otherUser } = conversation;
   const latestMessageText = conversation.id && conversation.latestMessageText;
 
+  const renderUnread = (activeConversation !== otherUser.username) && (unread > 0);
   return (
     <Box className={classes.root}>
       <Box>
@@ -35,6 +58,14 @@ const ChatContent = ({ conversation }) => {
         <Typography className={classes.previewText}>
           {latestMessageText}
         </Typography>
+        </Box>
+        <Box className={classes.unreadContainer}>
+          {renderUnread? (
+            <Typography className={classes.unreadCount}>
+          {unread}
+        </Typography>
+          ) : null}
+        
       </Box>
     </Box>
   );
