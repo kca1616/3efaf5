@@ -96,11 +96,13 @@ const Home = ({ user, logout }) => {
     (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
       const { message, sender = null } = data;
+      console.log(`%c${JSON.stringify(data)}`, 'background: pink; color: black; padding: 4px')
       if (sender !== null) {
         const newConvo = {
           id: message.conversationId,
           otherUser: sender,
           messages: [message],
+          unreadCounter: 1,
         };
         newConvo.latestMessageText = message.text;
         setConversations((prev) => [newConvo, ...prev]);
@@ -109,6 +111,7 @@ const Home = ({ user, logout }) => {
       conversations.forEach((convo) => {
         if (convo.id === message.conversationId) {
           convo.messages.push(message);
+          convo['unreadCounter'] = convo['unreadCounter'] + 1;
           convo.latestMessageText = message.text;
         }
       });
@@ -118,7 +121,17 @@ const Home = ({ user, logout }) => {
   );
 
   const setActiveChat = (username) => {
+    const newConvos = conversations.map((convo)=> {
+      if(convo.otherUser.username === username){
+        convo['unreadCounter'] = 0;
+      }
+      return convo;
+    })
+    
+    setConversations(newConvos);
+    
     setActiveConversation(username);
+    console.log(conversations);
   };
 
   const addOnlineUser = useCallback((id) => {
@@ -183,7 +196,8 @@ const Home = ({ user, logout }) => {
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get("/api/conversations");
-        setConversations(data);
+        const conversationsWithUnread = data.map((conv) => ({ ...conv, unreadCounter: 0 }))
+        setConversations(conversationsWithUnread);
       } catch (error) {
         console.error(error);
       }
@@ -191,7 +205,7 @@ const Home = ({ user, logout }) => {
     if (!user.isFetching) {
       fetchConversations();
     }
-  }, [user, conversations]);
+  }, [user, postMessage]);
 
   const handleLogout = async () => {
     if (user && user.id) {
