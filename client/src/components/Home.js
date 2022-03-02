@@ -62,9 +62,9 @@ const Home = ({ user, logout }) => {
     });
   };
 
-  const postMessage = (body) => {
+  const postMessage = async (body) => {
     try {
-      const data = saveMessage(body);
+      const data = await saveMessage(body);
 
       if (!body.conversationId) {
         addNewConvo(body.recipientId, data.message);
@@ -95,29 +95,41 @@ const Home = ({ user, logout }) => {
   const addMessageToConversation = useCallback(
     (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
-      const { message, sender = null } = data;
+      const { sender = null, message } = data;
       if (sender !== null) {
         const newConvo = {
           id: message.conversationId,
           otherUser: sender,
           messages: [message],
+          unreadCounter: 1,
         };
         newConvo.latestMessageText = message.text;
         setConversations((prev) => [newConvo, ...prev]);
-      }
-
-      conversations.forEach((convo) => {
-        if (convo.id === message.conversationId) {
-          convo.messages.push(message);
-          convo.latestMessageText = message.text;
-        }
+      } else {
+        const mappedConversations = conversations.map((convo) => {
+          if (convo.id === message.conversationId) {
+            convo.messages = [...convo.messages, message];
+            convo['unreadCounter'] = convo['unreadCounter'] + 1;
+            convo.latestMessageText = message.text;
+          }
+        return convo;
       });
-      setConversations(conversations);
+      setConversations(mappedConversations);
+    }
     },
     [setConversations, conversations],
   );
 
   const setActiveChat = (username) => {
+    const newConvos = conversations.map((convo) => {
+      if (convo.otherUser.username === username) {
+        convo['unreadCounter'] = 0;
+      }
+      return convo;
+    })
+
+    setConversations(newConvos);
+
     setActiveConversation(username);
   };
 
@@ -183,7 +195,9 @@ const Home = ({ user, logout }) => {
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get("/api/conversations");
-        setConversations(data);
+        console.log(data);
+        const conversationsWithUnread = data.map((conv) => ({ ...conv, unreadCounter: 0, messages: conv.messages.sort((a,b)=> a.id - b.id)}))
+        setConversations(conversationsWithUnread);
       } catch (error) {
         console.error(error);
       }
