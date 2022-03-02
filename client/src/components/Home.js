@@ -95,7 +95,6 @@ const Home = ({ user, logout }) => {
   const addMessageToConversation = useCallback(
     (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
-      console.log(data)
       const { sender = null, message } = data;
       if (sender !== null) {
         const newConvo = {
@@ -132,7 +131,6 @@ const Home = ({ user, logout }) => {
     setConversations(newConvos);
 
     setActiveConversation(username);
-    console.log(conversations);
   };
 
   const addOnlineUser = useCallback((id) => {
@@ -197,7 +195,8 @@ const Home = ({ user, logout }) => {
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get("/api/conversations");
-        const conversationsWithUnread = data.map((conv) => ({ ...conv, unreadCounter: 0 }))
+        console.log(data);
+        const conversationsWithUnread = data.map((conv) => ({ ...conv, unreadCounter: 0, messages: conv.messages.sort((a,b)=> a.id - b.id)}))
         setConversations(conversationsWithUnread);
       } catch (error) {
         console.error(error);
