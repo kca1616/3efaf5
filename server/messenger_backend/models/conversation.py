@@ -25,4 +25,5 @@ class Conversation(utils.CustomModel):
                 (Q(user2__id=user1Id) | Q(user2__id=user2Id)),
             )
         except Conversation.DoesNotExist:
+            print("in conversation")
             return None

@@ -109,7 +109,6 @@ const Home = ({ user, logout }) => {
         const mappedConversations = conversations.map((convo) => {
           if (convo.id === message.conversationId) {
             convo.messages = [...convo.messages, message];
-            convo['unreadCounter'] = convo['unreadCounter'] + 1;
             convo.latestMessageText = message.text;
           }
         return convo;
@@ -123,7 +122,9 @@ const Home = ({ user, logout }) => {
   const setActiveChat = (username) => {
     const newConvos = conversations.map((convo) => {
       if (convo.otherUser.username === username) {
-        convo['unreadCounter'] = 0;
+        axios.post("/api/conversations", {conversationId: convo.id }).catch((err) => console.log(err));
+        convo.unreadCounter = 0;
+        
       }
       return convo;
     })
@@ -195,8 +196,14 @@ const Home = ({ user, logout }) => {
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get("/api/conversations");
-        console.log(data);
-        const conversationsWithUnread = data.map((conv) => ({ ...conv, unreadCounter: 0, messages: conv.messages.sort((a,b)=> a.id - b.id)}))
+        const conversationsWithUnread = data.map((conv) => { 
+          let counter = 0;
+          conv.messages.forEach((message) => (message.read === false) && (message.senderId !==user.id) ? counter+=1 : counter);
+          
+          return {...conv, 
+          unreadCounter: counter, 
+          messages: conv.messages.sort((a,b)=> a.id - b.id)
+          }})
         setConversations(conversationsWithUnread);
       } catch (error) {
         console.error(error);

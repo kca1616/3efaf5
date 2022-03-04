@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@material-ui/core";
+import { Box, Typography, Badge } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 20,
     flexGrow: 1,
   },
-  
+
   username: {
     fontWeight: "bold",
     letterSpacing: -0.2,
@@ -20,24 +20,15 @@ const useStyles = makeStyles((theme) => ({
     letterSpacing: -0.17,
   },
 
-  unreadCount: {
-    backgroundColor: "#6CC1FF",
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 5,
-    color: "white",
-    padding: 4,
-    borderRadius: "50%",
-    width: '30px',
-    height: '30px',
-    
-  
-    
+  previewTextBold: {
+    fontSize: 12,
+    color: "black",
+    letterSpacing: -0.17,
+    fontWeight: "bold",
   },
 
   unreadContainer: {
-    marginRight: 20,
+    padding: "10px"
   }
 
 }));
@@ -47,28 +38,25 @@ const ChatContent = ({ conversation, unread, activeConversation }) => {
 
   const { otherUser } = conversation;
   const latestMessageText = conversation.id && conversation.latestMessageText;
-
-  const renderUnread = (activeConversation !== otherUser.username) && (unread > 0);
+  const renderUnread = (activeConversation !== otherUser.username) && (unread>0);
   return (
     <Box className={classes.root}>
       <Box>
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={classes.previewText}>
+        <Typography className={ renderUnread ? classes.previewTextBold : classes.previewText}>
           {latestMessageText}
         </Typography>
-        </Box>
-        <Box className={classes.unreadContainer}>
-          {renderUnread? (
-            <Typography className={classes.unreadCount}>
-          {unread}
-        </Typography>
-          ) : null}
-        
       </Box>
+      {renderUnread &&
+        <Badge anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} badgeContent={unread} color="primary">
+          <Box className={classes.unreadContainer}>
+          </Box>
+        </Badge>
+      }
     </Box>
-  );
+  )
 };
 
 export default ChatContent;

@@ -22,11 +22,12 @@ class Messages(APIView):
             recipient_id = body.get("recipientId")
             sender = body.get("sender")
 
+
             # if we already know conversation id, we can save time and just add it to message and return
             if conversation_id:
                 conversation = Conversation.objects.filter(id=conversation_id).first()
                 message = Message(
-                    senderId=sender_id, text=text, conversation=conversation
+                    senderId=sender_id, text=text, conversation=conversation, 
                 )
                 message.save()
                 message_json = message.to_dict()
