@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 import {
   Grid,
   Box,
@@ -7,7 +7,7 @@ import {
   Button,
   FormControl,
   TextField,
-} from '@material-ui/core';
+} from "@material-ui/core";
 
 const Login = ({ user, login }) => {
   const history = useHistory();
@@ -23,7 +23,7 @@ const Login = ({ user, login }) => {
   };
 
   useEffect(() => {
-    if (user && user.id) history.push('/home');
+    if (user && user.id) history.push("/home");
   }, [user, history]);
 
   return (

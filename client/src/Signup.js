@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 import {
   Grid,
   Box,
@@ -8,7 +8,7 @@ import {
   FormControl,
   TextField,
   FormHelperText,
-} from '@material-ui/core';
+} from "@material-ui/core";
 
 const Signup = ({ user, register }) => {
   const history = useHistory();
@@ -25,14 +25,14 @@ const Signup = ({ user, register }) => {
     const confirmPassword = formElements.confirmPassword.value;
 
     if (password !== confirmPassword) {
-      setFormErrorMessage({ confirmPassword: 'Passwords must match' });
+      setFormErrorMessage({ confirmPassword: "Passwords must match" });
       return;
     }
     await register({ username, email, password });
   };
 
   useEffect(() => {
-    if (user && user.id) history.push('/home');
+    if (user && user.id) history.push("/home");
   }, [user, history]);
 
   return (

@@ -22,11 +22,12 @@ class Conversations(APIView):
             user_id = user.id
 
             conversations = (
-                Conversation.objects.filter(Q(user1=user_id) | Q(user2=user_id))
+                Conversation.objects.filter(
+                    Q(user1=user_id) | Q(user2=user_id))
                 .prefetch_related(
                     Prefetch(
                         "messages", queryset=Message.objects.order_by("-createdAt")
-                    )
+                    ),
                 )
                 .all()
             )
@@ -37,9 +38,11 @@ class Conversations(APIView):
                 convo_dict = {
                     "id": convo.id,
                     "messages": [
-                        message.to_dict(["id", "text", "senderId", "createdAt"])
+                        message.to_dict(
+                            ["id", "text", "senderId", "read", "createdAt"])
                         for message in convo.messages.all()
                     ],
+                    "unreadCounter": Message.objects.filter(read=False, conversation__id=convo.id).exclude(senderId=user.id).count()
                 }
 
                 # set properties for notification count and latest message preview
@@ -67,5 +70,38 @@ class Conversations(APIView):
                 conversations_response,
                 safe=False,
             )
+        except Exception as e:
+            return HttpResponse(status=500)
+
+    def put(self, request: Request):
+        try:
+            user = get_user(request)
+
+            body = request.data
+            conversation_id = body.get("conversationId")
+            conv = Conversation.objects.get(pk=conversation_id)
+            conv = conv.to_dict()
+
+            if user.is_anonymous:
+                return HttpResponse(status=401)
+
+            if (conv['user1Id'] != user.id and conv['user2Id'] != user.id):
+                return HttpResponse(status=401)
+
+            conversation = (
+                Conversation.objects.get(pk=conversation_id)
+                .prefetch_related(
+                    Prefetch(
+                        "messages", queryset=Message.objects.filter(~Q(senderId=user.id))
+                    )
+                )
+            )
+
+            for message in conversation.messages:
+                message.read = True
+
+            Message.objects.bulk_update(conversation.messages, ['read'])
+            return HttpResponse(status=204)
+
         except Exception as e:
             return HttpResponse(status=500)
