@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Sidebar } from './index';
-import axios from 'axios';
+import React, { useState } from "react";
+import { Sidebar } from "./index";
+import axios from "axios";
 
 const SidebarContainer = ({
   conversations,
@@ -10,7 +10,7 @@ const SidebarContainer = ({
   setActiveChat,
   activeConversation,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   const searchUsers = async (searchTerm) => {
     try {
@@ -22,10 +22,10 @@ const SidebarContainer = ({
   };
 
   const handleChange = async (event) => {
-    if (event.target.value === '') {
+    if (event.target.value === "") {
       // clear searched convos
       clearSearchedUsers();
-      setSearchTerm('');
+      setSearchTerm("");
       return;
     }
     if (searchTerm.includes(event.target.value)) {
@@ -44,7 +44,7 @@ const SidebarContainer = ({
       conversations={conversations}
       user={user}
       setActiveChat={setActiveChat}
-      activeConversation = {activeConversation}
+      activeConversation={activeConversation}
     />
   );
 };

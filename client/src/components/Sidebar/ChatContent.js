@@ -28,9 +28,8 @@ const useStyles = makeStyles((theme) => ({
   },
 
   unreadContainer: {
-    padding: "10px"
-  }
-
+    padding: "10px",
+  },
 }));
 
 const ChatContent = ({ conversation, unread, activeConversation }) => {
@@ -38,25 +37,32 @@ const ChatContent = ({ conversation, unread, activeConversation }) => {
 
   const { otherUser } = conversation;
   const latestMessageText = conversation.id && conversation.latestMessageText;
-  const renderUnread = (activeConversation !== otherUser.username) && (unread>0);
+  const renderUnread = activeConversation !== otherUser.username && unread > 0;
   return (
     <Box className={classes.root}>
       <Box>
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={ renderUnread ? classes.previewTextBold : classes.previewText}>
+        <Typography
+          className={
+            renderUnread ? classes.previewTextBold : classes.previewText
+          }
+        >
           {latestMessageText}
         </Typography>
       </Box>
-      {renderUnread &&
-        <Badge anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} badgeContent={unread} color="primary">
-          <Box className={classes.unreadContainer}>
-          </Box>
+      {renderUnread && (
+        <Badge
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          badgeContent={unread}
+          color="primary"
+        >
+          <Box className={classes.unreadContainer}></Box>
         </Badge>
-      }
+      )}
     </Box>
-  )
+  );
 };
 
 export default ChatContent;

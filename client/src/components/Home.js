@@ -89,7 +89,7 @@ const Home = ({ user, logout }) => {
       });
       setConversations(conversations);
     },
-    [setConversations, conversations],
+    [setConversations, conversations]
   );
 
   const addMessageToConversation = useCallback(
@@ -111,27 +111,32 @@ const Home = ({ user, logout }) => {
             convo.messages = [...convo.messages, message];
             convo.latestMessageText = message.text;
           }
-        return convo;
-      });
-      setConversations(mappedConversations);
-    }
+          return convo;
+        });
+        setConversations(mappedConversations);
+      }
     },
-    [setConversations, conversations],
+    [setConversations, conversations]
   );
 
+  const setMessagesRead = async (convo) => {
+    return axios.put("/api/conversations", { conversationId: convo.id });
+  };
+
   const setActiveChat = (username) => {
-    const newConvos = conversations.map((convo) => {
-      if (convo.otherUser.username === username) {
-        axios.post("/api/conversations", {conversationId: convo.id }).catch((err) => console.log(err));
-        convo.unreadCounter = 0;
-        
-      }
-      return convo;
-    })
-
-    setConversations(newConvos);
-
-    setActiveConversation(username);
+    try {
+      const newConvos = conversations.map((convo) => {
+        if (convo.otherUser.username === username) {
+          setMessagesRead(convo);
+          convo.unreadCounter = 0;
+        }
+        return convo;
+      });
+      setConversations(newConvos);
+      setActiveConversation(username);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const addOnlineUser = useCallback((id) => {
@@ -144,7 +149,7 @@ const Home = ({ user, logout }) => {
         } else {
           return convo;
         }
-      }),
+      })
     );
   }, []);
 
@@ -158,7 +163,7 @@ const Home = ({ user, logout }) => {
         } else {
           return convo;
         }
-      }),
+      })
     );
   }, []);
 
@@ -196,14 +201,16 @@ const Home = ({ user, logout }) => {
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get("/api/conversations");
-        const conversationsWithUnread = data.map((conv) => { 
-          let counter = 0;
-          conv.messages.forEach((message) => (message.read === false) && (message.senderId !==user.id) ? counter+=1 : counter);
-          
-          return {...conv, 
-          unreadCounter: counter, 
-          messages: conv.messages.sort((a,b)=> a.id - b.id)
-          }})
+        const conversationsWithUnread = data.map((conv) => {
+          return {
+            ...conv,
+            unreadCounter: conv.unreadCounter,
+            messages: conv.messages.sort((a, b) => a.id - b.id),
+            userMessages: conv.messages.filter(
+              (message) => message.senderId === user.id
+            ),
+          };
+        });
         setConversations(conversationsWithUnread);
       } catch (error) {
         console.error(error);
@@ -231,7 +238,7 @@ const Home = ({ user, logout }) => {
           clearSearchedUsers={clearSearchedUsers}
           addSearchedUsers={addSearchedUsers}
           setActiveChat={setActiveChat}
-          activeConversation= {activeConversation}
+          activeConversation={activeConversation}
         />
         <ActiveChat
           activeConversation={activeConversation}

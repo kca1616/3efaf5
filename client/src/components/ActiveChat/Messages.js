@@ -1,15 +1,14 @@
-import React from 'react';
-import { Box, Avatar } from '@material-ui/core';
-import { SenderBubble, OtherUserBubble } from '.';
-import { makeStyles } from '@material-ui/core/styles';
-import moment from 'moment';
-
+import React from "react";
+import { Box, Avatar } from "@material-ui/core";
+import { SenderBubble, OtherUserBubble } from ".";
+import { makeStyles } from "@material-ui/core/styles";
+import moment from "moment";
 
 const useStyles = makeStyles(() => ({
   readLastMessage: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-end",
   },
   avatar: {
     height: 30,
@@ -20,34 +19,36 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Messages = (props) => {
-  const { messages, otherUser, userId } = props;
-  const userMessages = messages.filter((message) => message.senderId === userId);
+  const { messages, otherUser, userId, userMessages } = props;
   const lastSent = userMessages[userMessages.length - 1];
   const classes = useStyles();
 
   const renderAvatar = (message, time) => {
-    if (message.senderId === userId && lastSent.read && message.id === lastSent.id) {
+    if (
+      message.senderId === userId &&
+      lastSent.read &&
+      message.id === lastSent.id
+    ) {
       return (
-        <div className={classes.readLastMessage}>
+        <Box key={message.id} className={classes.readLastMessage}>
           <SenderBubble key={message.id} text={message.text} time={time} />
           <Avatar
+            key={otherUser.id}
             alt={otherUser.username}
             src={otherUser.photoUrl}
             className={classes.avatar}
           />
-        </div>
-      )
+        </Box>
+      );
     } else {
-      return (
-        <SenderBubble key={message.id} text={message.text} time={time} />
-      )
+      return <SenderBubble key={message.id} text={message.text} time={time} />;
     }
-  }
+  };
 
   return (
     <Box>
       {messages.map((message) => {
-        const time = moment(message.createdAt).format('h:mm');
+        const time = moment(message.createdAt).format("h:mm");
 
         return message.senderId === userId ? (
           renderAvatar(message, time)
